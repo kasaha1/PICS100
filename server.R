@@ -4,6 +4,7 @@ library(data.table)
 library(shiny)
 library(plotly)
 
+library(BiocManager)
 options(repos = BiocManager::repositories())
 library(pamr)
 library(impute)

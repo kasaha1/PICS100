@@ -10,6 +10,9 @@
 library(shiny)
 library(plotly)
 
+library(BiocManager)
+options(repos = BiocManager::repositories())
+
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
     # Application title
@@ -45,7 +48,7 @@ shinyUI(fluidPage(
             type = "tabs",
             tabPanel("How to use",
                      HTML("&nbsp; <p>Hi. This is the prediction tool for the analysis of HCC subtype using mRNA expression data.</p><p>Just upload your dataset. And press the prediction button. That's all. You can download example dataset from"),
-                     tags$a(href="https://raw.githubusercontent.com/kasaha1/PICS100/main/www/testDataset/testDataset_1.txt"," here."),
+                     tags$a(href="https://raw.githubusercontent.com/kasaha1/PICS100/main/www/testDataset/testDataset_1.csv"," here."),
                      HTML("</p><p>&nbsp;</p><p><b>Step 1. Prepare of dataset.</b></p>"
                      ),
                      img(
