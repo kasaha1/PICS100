@@ -3,6 +3,7 @@ library(tidyverse)
 library(data.table)
 library(shiny)
 library(plotly)
+library(heatmaply)
 
 library(BiocManager)
 options(repos = BiocManager::repositories())
@@ -63,9 +64,12 @@ colnames(centroid_gene)[c(3:(2 + length(levOfClass)))] <- levOfClass
 
 shinyServer(function(input, output) {
     # reactive function
+    
+    
     geneExprDataIn <- reactive({
         inFile <- input$geneExprfile
         req(inFile)
+        
         f <-
             fread(inFile$datapath) %>% as.data.frame() %>% kasa.duplicationRemovalBySD()
         
@@ -108,9 +112,31 @@ shinyServer(function(input, output) {
         return(fig)
         
     })
+    reavticResultHeatmapPlot <- reactive({
+        dataPlotly <- DoPIC100prediction()
+        dataRaw <- reactiveDataStandardization()
+        
+        data.sample.order <- dataPlotly %>% arrange(Class,posterior) 
+        data.sample.order.vector <- data.sample.order[,1] %>% as.character()
+        data.sample.order.labels <- data.sample.order %>% mutate(labels=paste(Class,":",Sample))
+        data.sample.order.labels <- data.sample.order.labels$labels %>% as.vector()
+        
+        data.heatmap <- dataRaw 
+       
+        data.heatmap <- data.heatmap[rev(1:nrow(data.heatmap)),data.sample.order.vector]
+        
+        
+        fig <- plot_ly(z = data.heatmap, type = "heatmap",colors = colorRamp(c("#009900","#00FF00","black","#FF0000","#990000")),y=rev(Genenames),x=data.sample.order.labels, zauto = FALSE, zmin = -4, zmax = 4) %>% layout(title="The Heatmap of your dataset",font=list(family="Arial"),xaxis=list(tickangle=45))
+        
+        return(fig)
+    })
     # event reactive
     DoPIC100prediction <- eventReactive(input$doPrediction, {
         testX <- reactiveDataStandardization()
+        
+        output$preparation <- renderText("")
+        output$preparation2 <- renderText("")
+        
         print("prediction start")
         
         res.class <-
@@ -169,4 +195,7 @@ shinyServer(function(input, output) {
     output$tablesTemp <- renderTable(DoPIC100prediction())
     output$resultSummaryPlot <- renderPlotly(reavticResultSummaryPlot())
     output$resultPiePlot <- renderPlotly(reavticResultPiePlot())
+    output$resultHeatmapPlot <- renderPlotly(reavticResultHeatmapPlot())
+    output$preparation <- renderText("Insert Your Dataset")
+    output$preparation2 <- renderText("Insert Your Dataset")
 })

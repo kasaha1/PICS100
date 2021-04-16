@@ -9,6 +9,7 @@
 
 library(shiny)
 library(plotly)
+library(heatmaply)
 
 library(BiocManager)
 options(repos = BiocManager::repositories())
@@ -61,11 +62,20 @@ shinyUI(fluidPage(
                      )
                      
             ),
-            tabPanel("Analysis Graph",
+            tabPanel("Analysis Summary",
+                     h3(textOutput("preparation")),
+                    
                      plotlyOutput("resultPiePlot"),
                      plotlyOutput("resultSummaryPlot")
             ),
-            tabPanel("Analysis table",
+            tabPanel("Analysis Result",
+                     h3(textOutput("preparation2")),
+                     img(
+                         src = "Fig1.png",
+                         width = 350,
+                         height = 200
+                     ),br(),br(),
+                     plotlyOutput("resultHeatmapPlot"),
                      tableOutput("tablesTemp"),
             ),
             tabPanel(

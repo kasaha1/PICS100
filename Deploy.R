@@ -4,3 +4,4 @@ rsconnect::setAccountInfo(name='kasaha1', token='6F76A57070059AF3831C684ACAEFAC4
 
 library(rsconnect)
 rsconnect::deployApp('C:/Users/kangs/Documents/GitHub/PICS100')
+
