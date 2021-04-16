@@ -68,7 +68,7 @@ shinyUI(fluidPage(
                      plotlyOutput("resultPiePlot"),
                      plotlyOutput("resultSummaryPlot")
             ),
-            tabPanel("Analysis Result",
+            tabPanel("Analysis Results",
                      h3(textOutput("preparation2")),
                      img(
                          src = "Fig1.png",
