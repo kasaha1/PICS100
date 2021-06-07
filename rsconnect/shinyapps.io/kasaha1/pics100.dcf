@@ -5,7 +5,9 @@ account: kasaha1
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 3765563
-bundleId: 4479314
+bundleId: 4685730
 url: https://kasaha1.shinyapps.io/pics100/
-when: 1618565271.56379
-lastSyncTime: 1618565271.56379
+when: 1623038742.51612
+lastSyncTime: 1623038742.51612
+asMultiple: FALSE
+asStatic: FALSE

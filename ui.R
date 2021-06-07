@@ -10,6 +10,7 @@
 library(shiny)
 library(plotly)
 library(heatmaply)
+library(shinycssloaders)
 
 library(BiocManager)
 options(repos = BiocManager::repositories())
@@ -49,7 +50,7 @@ shinyUI(fluidPage(
             type = "tabs",
             tabPanel("How to use",
                      HTML("&nbsp; <p>Hi. This is the prediction tool for the analysis of HCC subtype using mRNA expression data.</p><p>Just upload your dataset. And press the prediction button. That's all. You can download example dataset from"),
-                     tags$a(href="https://raw.githubusercontent.com/kasaha1/PICS100/main/www/testDataset/testDataset_1.csv"," here."),
+                     tags$a(href="https://raw.githubusercontent.com/kasaha1/PICS100/main/www/testDataset/testDataset_1.txt"," here."),
                      HTML("</p><p>&nbsp;</p><p><b>Step 1. Prepare of dataset.</b></p>"
                      ),
                      img(
@@ -62,20 +63,20 @@ shinyUI(fluidPage(
                      )
                      
             ),
-            tabPanel("Analysis Summary",
+            tabPanel("Your dataset summary",
                      h3(textOutput("preparation")),
                     
-                     plotlyOutput("resultPiePlot"),
+                     plotlyOutput("resultPiePlot") %>% withSpinner(color="#0dc5c1"),
                      plotlyOutput("resultSummaryPlot")
             ),
-            tabPanel("Analysis Results",
-                     h3(textOutput("preparation2")),
+            tabPanel("Your results",
+                     h4("PICS100 classification"),
                      img(
                          src = "Fig1.png",
                          width = 350,
                          height = 200
-                     ),br(),br(),
-                     plotlyOutput("resultHeatmapPlot"),
+                     ),br(),br(),h3(textOutput("preparation2")),
+                     plotlyOutput("resultHeatmapPlot") %>% withSpinner(color="#0dc5c1"),
                      tableOutput("tablesTemp"),
             ),
             tabPanel(

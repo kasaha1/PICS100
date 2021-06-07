@@ -4,6 +4,7 @@ library(data.table)
 library(shiny)
 library(plotly)
 library(heatmaply)
+library(shinycssloaders)
 
 library(BiocManager)
 options(repos = BiocManager::repositories())
@@ -62,7 +63,11 @@ colnames(centroid_gene)[c(3:(2 + length(levOfClass)))] <- levOfClass
 
 # Modeling finish
 
+# server functions----
 shinyServer(function(input, output) {
+    preparationText <- "Upload your dataset into the box on the left."
+    
+    
     # reactive function
     
     
@@ -134,8 +139,9 @@ shinyServer(function(input, output) {
     DoPIC100prediction <- eventReactive(input$doPrediction, {
         testX <- reactiveDataStandardization()
         
-        output$preparation <- renderText("")
-        output$preparation2 <- renderText("")
+        preparationText <<- ""
+        output$preparation <- renderText(preparationText)
+        output$preparation2 <- renderText(preparationText)
         
         print("prediction start")
         
@@ -196,6 +202,6 @@ shinyServer(function(input, output) {
     output$resultSummaryPlot <- renderPlotly(reavticResultSummaryPlot())
     output$resultPiePlot <- renderPlotly(reavticResultPiePlot())
     output$resultHeatmapPlot <- renderPlotly(reavticResultHeatmapPlot())
-    output$preparation <- renderText("Insert Your Dataset")
-    output$preparation2 <- renderText("Insert Your Dataset")
+    output$preparation <- renderText(preparationText)
+    output$preparation2 <- renderText(preparationText)
 })
