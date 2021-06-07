@@ -74,9 +74,7 @@ shinyServer(function(input, output) {
     geneExprDataIn <- reactive({
         inFile <- input$geneExprfile
         req(inFile)
-        
-        f <-
-            fread(inFile$datapath) %>% as.data.frame() %>% kasa.duplicationRemovalBySD()
+        f <-fread(inFile$datapath) %>% as.data.frame() %>% kasa.duplicationRemovalBySD()
         
         data.raw <- f
         colnames(data.raw)[1] <- c("genenames")
