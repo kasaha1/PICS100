@@ -5,6 +5,7 @@ library(shiny)
 library(plotly)
 library(heatmaply)
 library(shinycssloaders)
+library(HGNChelper)
 
 library(BiocManager)
 options(repos = BiocManager::repositories())
@@ -23,7 +24,8 @@ trainingGenenames <-
 trainingX <- trainingGeneMatrix %>% data.matrix() %>% impute.knn()
 trainingX <- trainingX$data
 
-Genenames <- trainingGenenames %>% t %>% as.vector()
+Genenames_precheck <- trainingGenenames %>% t %>% as.vector() %>% checkGeneSymbols
+Genenames <- Genenames_precheck[3] %>% t %>% as.vector() 
 
 ## transform 'class name' to numeric vector
 levOfClass <- trainingClass %>% t %>% as.factor() %>% levels()
@@ -68,7 +70,7 @@ shinyServer(function(input, output) {
     preparationText <- "Upload your dataset into the box on the left."
     
     
-    # reactive function
+    # reactive function ----
     
     
     geneExprDataIn <- reactive({
@@ -77,14 +79,27 @@ shinyServer(function(input, output) {
         f <-fread(inFile$datapath) %>% as.data.frame() %>% kasa.duplicationRemovalBySD()
         
         data.raw <- f
+        
+        HGNCcheck <- data.raw[1] %>% t() %>% as.vector()
+        checkedSymbols <- checkGeneSymbols(HGNCcheck)
+        data.raw[1] <- checkedSymbols[3]
+        HGNCcheckdata_FALSE <- checkedSymbols %>% filter(Approved == "FALSE")
+        HGNCcheckdata_FALSE <- HGNCcheckdata_FALSE[c(1,3)]
+        colnames(HGNCcheckdata_FALSE) <- c("YourGene.Symbols","HGNCsymbols.Converted")
+        # print(HGNCcheckdata_FALSE)
+        output$tablesConvertedGeneSymbols <- renderTable(HGNCcheckdata_FALSE)
         colnames(data.raw)[1] <- c("genenames")
+        
+        
         testDataset.modi <-
             left_join(x = trainingGenenames,
                       y = data.raw,
                       by = c("genenames"))
-       
-        # status <<- "File upload complete. The next step for analysis is ready."
-        # output$status <- renderText(status)
+        MissingValuseGenes <- testDataset.modi[!complete.cases(testDataset.modi),]
+        colnames(MissingValuseGenes)[1] <- c("Your symbols including Missing values")
+        output$MissingValuesSymbols <- renderTable(MissingValuseGenes[1])
+        
+
         return(testDataset.modi)
     })
     
@@ -133,7 +148,7 @@ shinyServer(function(input, output) {
         
         return(fig)
     })
-    # event reactive
+    # event reactive ----
     DoPIC100prediction <- eventReactive(input$doPrediction, {
         testX <- reactiveDataStandardization()
         

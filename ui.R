@@ -11,6 +11,7 @@ library(shiny)
 library(plotly)
 library(heatmaply)
 library(shinycssloaders)
+library(HGNChelper)
 
 library(BiocManager)
 options(repos = BiocManager::repositories())
@@ -59,13 +60,14 @@ shinyUI(fluidPage(
                          height = 150
                      ),
                      HTML(
-                         "<p> &nbsp;</p><p> The first line contains the labels Name(<em>HUGO Gene Nomenclature</em>) followed by the identifiers for each sample in the dataset.The dataset is the gene-level transcription estimates, as in log2(x+1) transformed normalized count. &nbsp;</p><p>&nbsp;</p><p><b>Step 2. Standardization. </b> &nbsp;</p><p> Select the data standardization method. &nbsp;</p><p><b>Step 3. Prediction.</b> &nbsp;</p><p> Press the predictiop. &nbsp;</p><p><b>Step 4. Check out the results.</b> &nbsp;</p><p>After analysis, You can find the results at the result tab. The results of dataset could be downloaded using the download button.</p>"
+                         "<p> &nbsp;</p><p> The first line contains the labels Name(<em>HUGO Gene Nomenclature</em>) followed by the identifiers for each sample in the dataset.The dataset is the gene-level transcription estimates, as in log2(x+1) transformed normalized count.&nbsp; </br>* The alias symbols are automatically converted to HGNC approved symbols by the HGNChelper package.&nbsp;</p><p>&nbsp;</p><p><b>Step 2. Standardization. </b> &nbsp;</p><p> Select the data standardization method. &nbsp;</p><p><b>Step 3. Prediction.</b> &nbsp;</p><p> Press the predictiop. &nbsp;</p><p><b>Step 4. Check out the results.</b> &nbsp;</p><p>After analysis, You can find the results at the result tab. The results of dataset could be downloaded using the download button.</p>"
                      )
                      
             ),
             tabPanel("Your dataset summary",
                      h3(textOutput("preparation")),
-                    
+                     tableOutput("tablesConvertedGeneSymbols"),
+                     tableOutput("MissingValuesSymbols"),
                      plotlyOutput("resultPiePlot") %>% withSpinner(color="#0dc5c1"),
                      plotlyOutput("resultSummaryPlot")
             ),
