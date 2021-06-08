@@ -1,4 +1,5 @@
 
+
 library(tidyverse)
 library(data.table)
 library(shiny)
@@ -24,8 +25,9 @@ trainingGenenames <-
 trainingX <- trainingGeneMatrix %>% data.matrix() %>% impute.knn()
 trainingX <- trainingX$data
 
-Genenames_precheck <- trainingGenenames %>% t %>% as.vector() %>% checkGeneSymbols
-Genenames <- Genenames_precheck[3] %>% t %>% as.vector() 
+Genenames_precheck <-
+    trainingGenenames %>% t %>% as.vector() %>% checkGeneSymbols
+Genenames <- Genenames_precheck[3] %>% t %>% as.vector()
 
 ## transform 'class name' to numeric vector
 levOfClass <- trainingClass %>% t %>% as.factor() %>% levels()
@@ -79,18 +81,22 @@ shinyServer(function(input, output) {
     geneExprDataIn <- reactive({
         inFile <- input$geneExprfile
         req(inFile)
-        f <-fread(inFile$datapath) %>% as.data.frame() %>% kasa.duplicationRemovalBySD()
+        f <-
+            fread(inFile$datapath) %>% as.data.frame() %>% kasa.duplicationRemovalBySD()
         
         data.raw <- f
         
         HGNCcheck <- data.raw[1] %>% t() %>% as.vector()
         checkedSymbols <- checkGeneSymbols(HGNCcheck)
         data.raw[1] <- checkedSymbols[3]
-        HGNCcheckdata_FALSE <- checkedSymbols %>% filter(Approved == "FALSE")
-        HGNCcheckdata_FALSE <- HGNCcheckdata_FALSE[c(1,3)]
-        colnames(HGNCcheckdata_FALSE) <- c("YourGene.Symbols","HGNCsymbols.Converted")
+        HGNCcheckdata_FALSE <-
+            checkedSymbols %>% filter(Approved == "FALSE")
+        HGNCcheckdata_FALSE <- HGNCcheckdata_FALSE[c(1, 3)]
+        colnames(HGNCcheckdata_FALSE) <-
+            c("YourGene.Symbols", "HGNCsymbols.Converted")
         # print(HGNCcheckdata_FALSE)
-        output$tablesConvertedGeneSymbols <- renderTable(HGNCcheckdata_FALSE)
+        output$tablesConvertedGeneSymbols <-
+            renderTable(HGNCcheckdata_FALSE)
         colnames(data.raw)[1] <- c("genenames")
         
         
@@ -98,11 +104,14 @@ shinyServer(function(input, output) {
             left_join(x = trainingGenenames,
                       y = data.raw,
                       by = c("genenames"))
-        MissingValuseGenes <- testDataset.modi[!complete.cases(testDataset.modi),]
-        colnames(MissingValuseGenes)[1] <- c("Your symbols including Missing values")
-        output$MissingValuesSymbols <- renderTable(MissingValuseGenes[1])
+        MissingValuseGenes <-
+            testDataset.modi[!complete.cases(testDataset.modi), ]
+        colnames(MissingValuseGenes)[1] <-
+            c("Your symbols including Missing values")
+        output$MissingValuesSymbols <-
+            renderTable(MissingValuseGenes[1])
         
-
+        
         return(testDataset.modi)
     })
     
@@ -110,10 +119,9 @@ shinyServer(function(input, output) {
         if (input$standardizationType == "medianCenter") {
             data.raw <- geneExprDataIn() %>% kasa.geneMedianCentering()
         } else {
-            
             data.raw <-
                 geneExprDataIn() %>% kasa.geneMedianCentering() %>% kasa.geneStandardization()
-           
+            
         }
         testX.p <- data.raw[-1] %>% data.matrix() %>% impute.knn()
         testX <- testX.p$data
@@ -123,13 +131,23 @@ shinyServer(function(input, output) {
     
     reavticResultSummaryPlot <- reactive({
         dataPlotly <- DoPIC100prediction()
-        fig <- plot_ly(dataPlotly,y = ~posterior, x=~Class, color=~Class, text=~paste(Sample), type = 'box', jitter=0.3,boxpoints = 'all')
+        fig <-
+            plot_ly(
+                dataPlotly,
+                y = ~ posterior,
+                x =  ~ Class,
+                color =  ~ Class,
+                text =  ~ paste(Sample),
+                type = 'box',
+                jitter = 0.3,
+                boxpoints = 'all'
+            )
         return(fig)
         
     })
     reavticResultPiePlot <- reactive({
         dataPlotly <- DoPIC100prediction()
-        fig <- plot_ly(dataPlotly, labels = ~Class, type = 'pie')
+        fig <- plot_ly(dataPlotly, labels = ~ Class, type = 'pie')
         return(fig)
         
     })
@@ -137,17 +155,38 @@ shinyServer(function(input, output) {
         dataPlotly <- DoPIC100prediction()
         dataRaw <- reactiveDataStandardization()
         
-        data.sample.order <- dataPlotly %>% arrange(Class,posterior) 
-        data.sample.order.vector <- data.sample.order[,1] %>% as.character()
-        data.sample.order.labels <- data.sample.order %>% mutate(labels=paste(Class,":",Sample))
-        data.sample.order.labels <- data.sample.order.labels$labels %>% as.vector()
+        data.sample.order <-
+            dataPlotly %>% arrange(Class, posterior)
+        data.sample.order.vector <-
+            data.sample.order[, 1] %>% as.character()
+        data.sample.order.labels <-
+            data.sample.order %>% mutate(labels = paste(Class, ":", Sample))
+        data.sample.order.labels <-
+            data.sample.order.labels$labels %>% as.vector()
         
-        data.heatmap <- dataRaw 
-       
-        data.heatmap <- data.heatmap[rev(1:nrow(data.heatmap)),data.sample.order.vector]
+        data.heatmap <- dataRaw
+        
+        data.heatmap <-
+            data.heatmap[rev(1:nrow(data.heatmap)), data.sample.order.vector]
         
         
-        fig <- plot_ly(z = data.heatmap, type = "heatmap",colors = colorRamp(c("#009900","#00FF00","black","#FF0000","#990000")),y=rev(Genenames),x=data.sample.order.labels, zauto = FALSE, zmin = -4, zmax = 4) %>% layout(title="The Heatmap of your dataset",font=list(family="Arial"),xaxis=list(tickangle=45))
+        fig <-
+            plot_ly(
+                z = data.heatmap,
+                type = "heatmap",
+                colors = colorRamp(c(
+                    "#009900", "#00FF00", "black", "#FF0000", "#990000"
+                )),
+                y = rev(Genenames),
+                x = data.sample.order.labels,
+                zauto = FALSE,
+                zmin = -4,
+                zmax = 4
+            ) %>% layout(
+                title = "The Heatmap of your dataset",
+                font = list(family = "Arial"),
+                xaxis = list(tickangle = 45)
+            )
         
         return(fig)
     })
@@ -209,7 +248,7 @@ shinyServer(function(input, output) {
         },
         content = function(file) {
             contents.table <- DoPIC100prediction()
-            write_delim(contents.table, file, delim = "\t",na = "")
+            write_delim(contents.table, file, delim = "\t", na = "")
         },
         contentType = "text/plain"
     )
@@ -219,15 +258,17 @@ shinyServer(function(input, output) {
         },
         content = function(file) {
             contents.table <- fread("./www/testDataset/Example_ZS159.txt")
-            write_delim(contents.table, file, delim = "\t",na = "")
+            write_delim(contents.table, file, delim = "\t", na = "")
         },
         contentType = "text/plain"
     )
     # ouput rendering
     output$tablesTemp <- renderTable(DoPIC100prediction())
-    output$resultSummaryPlot <- renderPlotly(reavticResultSummaryPlot())
+    output$resultSummaryPlot <-
+        renderPlotly(reavticResultSummaryPlot())
     output$resultPiePlot <- renderPlotly(reavticResultPiePlot())
-    output$resultHeatmapPlot <- renderPlotly(reavticResultHeatmapPlot())
+    output$resultHeatmapPlot <-
+        renderPlotly(reavticResultHeatmapPlot())
     output$preparation <- renderText(preparationText)
     output$preparation2 <- renderText(preparationText)
 })
