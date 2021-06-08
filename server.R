@@ -70,7 +70,10 @@ shinyServer(function(input, output) {
     preparationText <- "Upload your dataset into the box on the left."
     
     
+    
     # reactive function ----
+    
+    
     
     
     geneExprDataIn <- reactive({
@@ -206,6 +209,16 @@ shinyServer(function(input, output) {
         },
         content = function(file) {
             contents.table <- DoPIC100prediction()
+            write_delim(contents.table, file, delim = "\t",na = "")
+        },
+        contentType = "text/plain"
+    )
+    output$downloadExample <- downloadHandler(
+        filename = function() {
+            "Example_ZS159.txt"
+        },
+        content = function(file) {
+            contents.table <- fread("./www/testDataset/Example_ZS159.txt")
             write_delim(contents.table, file, delim = "\t",na = "")
         },
         contentType = "text/plain"
