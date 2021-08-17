@@ -71,8 +71,6 @@ colnames(centroid_gene)[c(3:(2 + length(levOfClass)))] <- levOfClass
 shinyServer(function(input, output) {
     preparationText <- "Upload your dataset into the box on the left."
     
-    
-    
     # reactive function ----
     
     
@@ -116,14 +114,27 @@ shinyServer(function(input, output) {
     })
     
     reactiveDataStandardization <- reactive({
-        if (input$standardizationType == "medianCenter") {
-            data.raw <- geneExprDataIn() %>% kasa.geneMedianCentering()
-        } else {
+        
+        # standardization
+        if (input$standardizationType == "NoneS") {
+            data.raw <- geneExprDataIn() 
+        # } else if (input$standardizationType == "medianCenter") {
+        #     data.raw <- geneExprDataIn() %>% kasa.geneMedianCentering()
+        } else if (input$standardizationType == "devidedBySD")
+        {
             data.raw <-
                 geneExprDataIn() %>% kasa.geneMedianCentering() %>% kasa.geneStandardization()
             
         }
-        testX.p <- data.raw[-1] %>% data.matrix() %>% impute.knn()
+        
+        # impute
+        if (ncol(data.raw) < 3) {
+            rowmax.value <- 1
+        } else {
+            rowmax.value <- 0.5
+        }  # rowmax decision by the number of samples
+        
+        testX.p <- data.raw[-1] %>% data.matrix() %>% impute.knn(rowmax = rowmax.value)
         testX <- testX.p$data
         
         return(testX)

@@ -46,10 +46,11 @@ shinyUI(fluidPage(
                 'standardizationType',
                 'Standardization',
                 c(
-                    'Mendian-centering only' = 'medianCenter',
+                    'Non-standardization (For single-sample use)' = 'NoneS',
+                    # 'Mendian-centering only' = 'medianCenter',
                     'Median-centering and dividing by SD' = 'devidedBySD'
                 ),
-                'medianCenter'
+                'devidedBySD'
             ),
             actionButton("doPrediction", "Prediction", class = "btn-primary"),
             br(),
