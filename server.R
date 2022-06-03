@@ -282,4 +282,15 @@ shinyServer(function(input, output) {
         renderPlotly(reavticResultHeatmapPlot())
     output$preparation <- renderText(preparationText)
     output$preparation2 <- renderText(preparationText)
+    
+    output$counter <- 
+      renderText({
+        if (!file.exists("counter.Rdata")) 
+          counter <- 0
+        else
+          load(file="counter.Rdata")
+        counter  <- counter + 1
+        save(counter, file="counter.Rdata")     
+        paste("Total number of visitors: ", counter)
+      })
 })

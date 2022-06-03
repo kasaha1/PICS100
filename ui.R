@@ -117,7 +117,8 @@ shinyUI(fluidPage(
                         src = "Fig2.png",
                         width = 500,
                         height = 600
-                    )
+                    ),
+                    h5(textOutput("counter"))
                 )
             )
         )
